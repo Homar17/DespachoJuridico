@@ -1,6 +1,29 @@
 @backend_HostAddress = http://localhost:5039
 
-GET {{backend_HostAddress}}/weatherforecast/
+###
+GET {{backend_HostAddress}}/api/roles
 Accept: application/json
 
 ###
+POST {{backend_HostAddress}}/api/roles
+Content-Type: application/json
+
+{
+  "descripcion": "Administrador"
+}
+
+###
+POST {{backend_HostAddress}}/api/roles
+Content-Type: application/json
+
+{
+  "descripcion": "Abogado"
+}
+
+###
+POST {{backend_HostAddress}}/api/roles
+Content-Type: application/json
+
+{
+  "descripcion": "Cliente"
+}
