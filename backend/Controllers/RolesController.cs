@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace backend.Controllers
 {
-    // Esta ruta significa que accederás a él mediante: https://localhost:puerto/api/roles
     [Route("api/[controller]")]
     [ApiController]
     public class RolesController : ControllerBase
@@ -18,7 +17,6 @@ namespace backend.Controllers
             _context = context;
         }
 
-        // GET: api/Roles (Obtener todos los roles)
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Rol>>> GetRoles()
         {

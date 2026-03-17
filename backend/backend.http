@@ -1,29 +1,14 @@
 @backend_HostAddress = http://localhost:5039
 
-###
-GET {{backend_HostAddress}}/api/roles
-Accept: application/json
-
-###
-POST {{backend_HostAddress}}/api/roles
+### Crear un Usuario
+POST {{backend_HostAddress}}/api/usuarios
 Content-Type: application/json
 
 {
-  "descripcion": "Administrador"
-}
-
-###
-POST {{backend_HostAddress}}/api/roles
-Content-Type: application/json
-
-{
-  "descripcion": "Abogado"
-}
-
-###
-POST {{backend_HostAddress}}/api/roles
-Content-Type: application/json
-
-{
-  "descripcion": "Cliente"
+  "nombre": "Omar Alejandro Brizuela",
+  "telefono": "3312345678",
+  "correo": "admin@despacho.com",
+  "contraseña": "Password123",
+  "user": "admin_omar",
+  "rolId": 1
 }
