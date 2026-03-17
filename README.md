@@ -31,16 +31,3 @@ Este proyecto es un sistema integral cliente-servidor desarrollado para facilita
 - **Motor:** PostgreSQL
 - **Diseño:** Modelo Entidad-Relación
 
-## 🚀 Instalación y Configuración Local
-
-Sigue estos pasos para ejecutar el proyecto en tu entorno local.
-
-### Prerrequisitos
-- [.NET 8 SDK](https://dotnet.microsoft.com/download)
-- [Node.js](https://nodejs.org/) (versión 18 o superior)
-- [PostgreSQL](https://www.postgresql.org/)
-
-### 1. Clonar el repositorio
-```bash
-git clone [https://github.com/](https://github.com/)[Tu-Usuario-GitHub]/[Nombre-Del-Repo].git
-cd [Nombre-Del-Repo]
