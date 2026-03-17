@@ -30,7 +30,6 @@ namespace backend.Models
         [Required]
         public DateTime FechaInicio { get; set; }
 
-        // El signo de interrogación indica que es NULLABLE (puede estar vacío)
         public DateTime? FechaFin { get; set; }
 
         [Required]

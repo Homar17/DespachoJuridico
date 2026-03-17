@@ -1,14 +1,12 @@
-@backend_HostAddress = http://localhost:5039
-
-### Crear un Usuario
-POST {{backend_HostAddress}}/api/usuarios
+### Crear el primer Expediente (Caso)
+POST {{backend_HostAddress}}/api/casos
 Content-Type: application/json
 
 {
-  "nombre": "Omar Alejandro Brizuela",
-  "telefono": "3312345678",
-  "correo": "admin@despacho.com",
-  "contraseña": "Password123",
-  "user": "admin_omar",
-  "rolId": 1
+  "id_usuario": 1,
+  "titulo": "Divorcio por Mutuo Consentimiento",
+  "descripcion": "El cliente y su cónyuge han acordado los términos del divorcio y separación de bienes.",
+  "id_estatus": 1,
+  "fechaInicio": "2026-03-17T10:00:00Z",
+  "id_RamaJuridica": 1
 }
