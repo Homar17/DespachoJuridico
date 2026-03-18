@@ -1,12 +1,8 @@
-### Crear el primer Expediente (Caso)
-POST {{backend_HostAddress}}/api/casos
+POST {{backend_HostAddress}}/api/citas
 Content-Type: application/json
 
 {
-  "id_usuario": 1,
-  "titulo": "Divorcio por Mutuo Consentimiento",
-  "descripcion": "El cliente y su cónyuge han acordado los términos del divorcio y separación de bienes.",
-  "id_estatus": 1,
-  "fechaInicio": "2026-03-17T10:00:00Z",
-  "id_RamaJuridica": 1
+  "id_user": 1,
+  "fechaHora": "2026-03-21T17:15:00Z",
+  "descripcion": "Quiero mi cita a las 11 y cuarto"
 }
