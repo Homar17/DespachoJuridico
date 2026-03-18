@@ -1,11 +1,13 @@
 ﻿using backend.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class CasosController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
@@ -83,6 +85,7 @@ namespace backend.Controllers
 
         // DELETE: api/Casos/
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> DeleteCaso(int id)
         {
             var caso = await _context.Casos.FindAsync(id);
