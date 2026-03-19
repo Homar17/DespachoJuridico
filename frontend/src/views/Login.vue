@@ -69,7 +69,7 @@
       })
   
       localStorage.setItem('token', respuesta.data.token)
-      router.push('/casos') 
+      router.push('/') 
       
     } catch (error) {
       console.error(error)

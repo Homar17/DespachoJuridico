@@ -9,15 +9,31 @@
             <p class="text-despacho-fondo/60 font-medium mt-1">Gestión administrativa y jurídica</p>
           </div>
           
-          <button 
-            @click="cerrarSesion" 
-            class="flex items-center justify-center gap-2 px-5 py-2.5 bg-despacho-rojo text-white font-semibold rounded-xl hover:bg-despacho-rojo/90 transition-all active:scale-95 shadow-lg shadow-black/20"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
-            </svg>
-            Cerrar Sesión
-          </button>
+          <div class="flex flex-wrap items-center gap-3">
+            <router-link 
+              to="/" 
+              class="text-xs font-bold uppercase tracking-widest text-despacho-tierra hover:text-white transition-colors"
+            >
+              Ir al Inicio
+            </router-link>
+
+            <router-link 
+              to="/citas" 
+              class="px-5 py-2.5 bg-white/5 border border-white/10 text-despacho-fondo font-semibold rounded-xl hover:bg-white/10 transition-all active:scale-95 text-sm"
+            >
+              Ver Agenda
+            </router-link>
+            
+            <button 
+              @click="cerrarSesion" 
+              class="flex items-center justify-center gap-2 px-5 py-2.5 bg-despacho-rojo text-white font-semibold rounded-xl hover:bg-despacho-rojo/90 transition-all active:scale-95 shadow-lg shadow-black/20 text-sm"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
+              </svg>
+              Cerrar Sesión
+            </button>
+          </div>
         </header>
   
         <div class="mb-10 relative max-w-2xl">
