@@ -110,6 +110,7 @@
   import axios from 'axios'
   import { useRouter } from 'vue-router'
   import ModalCaso from '../components/ModalCaso.vue'
+  import Swal from 'sweetalert2'
   
   const citas = ref([])
   const cargando = ref(true)
@@ -168,12 +169,30 @@
         headers: { Authorization: `Bearer ${token}` }
       })
       mostrarModalCaso.value = false
-      alert("¡Expediente creado exitosamente!")
+      
+      await Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: 'success',
+        title: 'Expediente iniciado correctamente',
+        showConfirmButton: false,
+        timer: 2000,
+        background: '#1a1a1c',
+        color: '#fdfbd4',
+        iconColor: '#4ade80'
+      })
       
       router.push('/casos')
     } catch (e) {
       console.error(e)
-      alert("Error al crear el expediente. Verifica que la Rama y el Estatus existan en tu base de datos.")
+      Swal.fire({
+        icon: 'error',
+        title: 'Error de creación',
+        text: 'Verifica que la Rama y el Estatus existan en tu base de datos.',
+        background: '#1a1a1c',
+        color: '#fdfbd4',
+        confirmButtonColor: '#8B0000'
+      })
     }
   }
 

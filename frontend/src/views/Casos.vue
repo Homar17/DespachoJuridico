@@ -123,6 +123,7 @@
   import axios from 'axios'
   import { useRouter } from 'vue-router'
   import ModalCaso from '../components/ModalCaso.vue'
+  import Swal from 'sweetalert2'
   
   const casos = ref([])
   const textoBusqueda = ref('')
@@ -162,8 +163,29 @@
       })
       mostrarModal.value = false
       obtenerCasos()
+
+      Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: 'success',
+        title: 'Expediente creado con éxito',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        background: '#1a1a1c',
+        color: '#fdfbd4',
+        iconColor: '#4ade80'
+      })
+
     } catch (e) {
-      alert("Error al guardar: Verifica los IDs")
+      Swal.fire({
+        icon: 'error',
+        title: 'Error de servidor',
+        text: 'No se pudo crear el expediente. Verifica los datos.',
+        background: '#1a1a1c',
+        color: '#fdfbd4',
+        confirmButtonColor: '#8B0000'
+      })
     }
   }
   

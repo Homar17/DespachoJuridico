@@ -16,7 +16,7 @@
   
         <form @submit.prevent="enviarFormulario" class="p-8 space-y-6">
           
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 relative">
             
             <div>
               <label class="block text-xs font-bold uppercase tracking-widest text-despacho-tierra mb-1.5">Fecha de la Cita</label>
@@ -25,12 +25,13 @@
                 type="date" 
                 :min="fechaMinima"
                 :max="fechaMaxima"
+                @change="validarDiaHabil"
                 class="w-full bg-white/5 border border-despacho-fondo/20 text-despacho-fondo rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-despacho-rojo transition-all [color-scheme:dark]"
                 required 
               />
             </div>
   
-            <div>
+            <div class="relative">
               <label class="block text-xs font-bold uppercase tracking-widest text-despacho-tierra mb-1.5">Hora Disponible</label>
               <select 
                 v-model="horaSeleccionada"
@@ -47,7 +48,7 @@
                   {{ hora }} hrs
                 </option>
               </select>
-              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 pt-6 text-despacho-fondo/50">
+              <div class="pointer-events-none absolute bottom-0 right-0 flex items-center px-4 pb-4 text-despacho-fondo/50">
                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
               </div>
             </div>
@@ -88,78 +89,100 @@
         </form>
       </div>
     </div>
-  </template>
+</template>
   
-  <script setup>
-  import { ref, computed } from 'vue'
+<script setup>
+import { ref } from 'vue'
+import Swal from 'sweetalert2' // <-- Importamos SweetAlert2
+
+const emit = defineEmits(['cerrar', 'agendar'])
+
+const fechaSeleccionada = ref('')
+const horaSeleccionada = ref('')
+const descripcion = ref('')
+const errorMsg = ref('')
+const cargando = ref(false)
+
+const obtenerFechasLimites = () => {
+  const hoy = new Date()
   
-  const emit = defineEmits(['cerrar', 'agendar'])
+  const manana = new Date(hoy)
+  manana.setDate(manana.getDate() + 1)
   
-  const fechaSeleccionada = ref('')
-  const horaSeleccionada = ref('')
-  const descripcion = ref('')
-  const errorMsg = ref('')
-  const cargando = ref(false)
+  const offset = manana.getTimezoneOffset()
+  const fechaMin = new Date(manana.getTime() - (offset*60*1000)).toISOString().split('T')[0]
+
+  const mesSiguiente = new Date(hoy)
+  mesSiguiente.setMonth(mesSiguiente.getMonth() + 1)
+  const fechaMax = new Date(mesSiguiente.getTime() - (offset*60*1000)).toISOString().split('T')[0]
+
+  return { fechaMin, fechaMax }
+}
+
+const { fechaMin, fechaMax } = obtenerFechasLimites()
+const fechaMinima = ref(fechaMin)
+const fechaMaxima = ref(fechaMax)
+
+const horasDisponibles = [
+  '09:00', '10:00', '11:00', '12:00', '13:00', 
+  '14:00', '15:00', '16:00', '17:00', '18:00'
+]
+
+// 👇 NUEVA FUNCIÓN: Validar que no sea Sábado ni Domingo 👇
+const validarDiaHabil = () => {
+  if (!fechaSeleccionada.value) return; 
+
+  // Separamos año, mes y día para evitar que la zona horaria nos mueva la fecha
+  const [year, month, day] = fechaSeleccionada.value.split('-');
+  const fechaSeleccionadaObj = new Date(year, month - 1, day);
   
-  // 1. Lógica para limitar la fecha (Mínimo Hoy, Máximo 1 mes)
-  const obtenerFechasLimites = () => {
-    const hoy = new Date()
+  // getDay(): 0 es Domingo, 6 es Sábado
+  const diaDeLaSemana = fechaSeleccionadaObj.getDay();
+
+  if (diaDeLaSemana === 0 || diaDeLaSemana === 6) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Día Inhábil',
+      text: 'El despacho solo atiende de Lunes a Viernes. Por favor selecciona otro día.',
+      background: '#1a1a1c',
+      color: '#fdfbd4',
+      confirmButtonColor: '#8B0000'
+    });
     
-    // Fecha mínima (Hoy en formato YYYY-MM-DD)
-    // Usamos un pequeño ajuste para evitar problemas con zonas horarias
-    const offset = hoy.getTimezoneOffset()
-    const fechaMin = new Date(hoy.getTime() - (offset*60*1000)).toISOString().split('T')[0]
-    
-    // Fecha máxima (1 mes después)
-    const mesSiguiente = new Date(hoy)
-    mesSiguiente.setMonth(mesSiguiente.getMonth() + 1)
-    const fechaMax = new Date(mesSiguiente.getTime() - (offset*60*1000)).toISOString().split('T')[0]
-  
-    return { fechaMin, fechaMax }
+    // Limpiamos el campo para que deba elegir otra fecha
+    fechaSeleccionada.value = '';
   }
+}
+
+const setMensajeError = (mensaje) => {
+  errorMsg.value = mensaje
+  cargando.value = false
+}
+
+defineExpose({ setMensajeError })
+
+const enviarFormulario = () => {
+  errorMsg.value = ''
   
-  const { fechaMin, fechaMax } = obtenerFechasLimites()
-  const fechaMinima = ref(fechaMin)
-  const fechaMaxima = ref(fechaMax)
-  
-  // 2. Lógica para limitar las horas (9am a 6pm)
-  const horasDisponibles = [
-    '09:00', '10:00', '11:00', '12:00', '13:00', 
-    '14:00', '15:00', '16:00', '17:00', '18:00'
-  ]
-  
-  const setMensajeError = (mensaje) => {
-    errorMsg.value = mensaje
-    cargando.value = false
+  if (!fechaSeleccionada.value || !horaSeleccionada.value || !descripcion.value) {
+    errorMsg.value = "Por favor completa todos los campos."
+    return
   }
+
+  cargando.value = true
   
-  defineExpose({ setMensajeError })
-  
-  const enviarFormulario = () => {
-    errorMsg.value = ''
-    
-    if (!fechaSeleccionada.value || !horaSeleccionada.value || !descripcion.value) {
-      errorMsg.value = "Por favor completa todos los campos."
-      return
-    }
-  
-    cargando.value = true
-    
-    // Fusionamos la fecha y la hora para enviarlas a .NET como un solo DateTime
-    // Ejemplo resultante: "2026-03-20T14:00:00"
-    const fechaHoraString = `${fechaSeleccionada.value}T${horaSeleccionada.value}:00`
-  
-    emit('agendar', {
-      FechaHora: new Date(fechaHoraString).toISOString(),
-      Descripcion: descripcion.value
-    })
-  }
-  </script>
-  
-  <style scoped>
-  /* Ocultamos el calendario nativo feo en algunos navegadores para el input de fecha */
-  input[type="date"]::-webkit-calendar-picker-indicator {
-      filter: invert(1);
-      cursor: pointer;
-  }
-  </style>
+  const fechaHoraString = `${fechaSeleccionada.value}T${horaSeleccionada.value}:00`
+
+  emit('agendar', {
+    FechaHora: new Date(fechaHoraString).toISOString(),
+    Descripcion: descripcion.value
+  })
+}
+</script>
+
+<style scoped>
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    cursor: pointer;
+}
+</style>
