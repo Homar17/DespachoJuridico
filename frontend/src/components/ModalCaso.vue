@@ -136,7 +136,7 @@
   
     try {
       const [resRamas, resEstatus] = await Promise.all([
-        axios.get('http://localhost:5039/api/RamasJuridicas', { headers: { Authorization: `Bearer ${token}` } }),
+        axios.get('http://localhost:5039/api/RamaJuridica', { headers: { Authorization: `Bearer ${token}` } }),
         axios.get('http://localhost:5039/api/Estatus', { headers: { Authorization: `Bearer ${token}` } })
       ])
   
