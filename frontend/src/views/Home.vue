@@ -44,11 +44,14 @@
               
               <span class="text-xs font-medium text-despacho-fondo/70">Hola, {{ userName }}</span>
               <button 
-                @click="cerrarSesion" 
-                class="text-xs font-bold uppercase tracking-widest text-despacho-rojo hover:text-white transition-colors"
-              >
-                Cerrar Sesión
-              </button>
+              @click="cerrarSesion" 
+              class="flex items-center justify-center gap-2 px-5 py-2.5 bg-despacho-rojo text-white font-semibold rounded-xl hover:bg-despacho-rojo/90 transition-all active:scale-95 shadow-lg shadow-black/20 text-sm"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
+              </svg>
+              Cerrar Sesión
+            </button>
             </template>
           </div>
         </div>
@@ -57,11 +60,11 @@
       <main class="max-w-7xl mx-auto px-6 md:px-10 pt-20 pb-24 md:pt-32 flex flex-col items-center text-center relative">
         <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-despacho-rojo/5 rounded-full blur-3xl -z-10 pointer-events-none"></div>
   
-        <span class="text-despacho-rojo font-bold tracking-[0.2em] text-sm md:text-base mb-6 uppercase">
-          Experiencia • Firmeza • Resultados
+        <span class="text-despacho-rosa font-bold tracking-[0.2em] text-sm md:text-base mb-6 uppercase">
+          Experiencia - Firmeza - Resultados
         </span>
         
-        <h1 class="text-5xl md:text-7xl font-black mb-8 leading-tight max-w-4xl text-transparent bg-clip-text bg-gradient-to-br from-white to-despacho-tierra">
+        <h1 class="md:text-7xl font-black mb-8 leading-tight max-w-4xl text-transparent bg-clip-text uppercase bg-gradient-to-br from-white to-despacho-tierra">
           Protegemos tu patrimonio y tranquilidad legal.
         </h1>
         
