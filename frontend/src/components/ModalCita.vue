@@ -93,7 +93,7 @@
   
 <script setup>
 import { ref } from 'vue'
-import Swal from 'sweetalert2' // <-- Importamos SweetAlert2
+import Swal from 'sweetalert2'
 
 const emit = defineEmits(['cerrar', 'agendar'])
 
@@ -128,15 +128,12 @@ const horasDisponibles = [
   '14:00', '15:00', '16:00', '17:00', '18:00'
 ]
 
-// 👇 NUEVA FUNCIÓN: Validar que no sea Sábado ni Domingo 👇
 const validarDiaHabil = () => {
   if (!fechaSeleccionada.value) return; 
 
-  // Separamos año, mes y día para evitar que la zona horaria nos mueva la fecha
   const [year, month, day] = fechaSeleccionada.value.split('-');
   const fechaSeleccionadaObj = new Date(year, month - 1, day);
   
-  // getDay(): 0 es Domingo, 6 es Sábado
   const diaDeLaSemana = fechaSeleccionadaObj.getDay();
 
   if (diaDeLaSemana === 0 || diaDeLaSemana === 6) {
@@ -149,7 +146,6 @@ const validarDiaHabil = () => {
       confirmButtonColor: '#8B0000'
     });
     
-    // Limpiamos el campo para que deba elegir otra fecha
     fechaSeleccionada.value = '';
   }
 }

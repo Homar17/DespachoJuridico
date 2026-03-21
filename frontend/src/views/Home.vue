@@ -31,6 +31,12 @@
                 
                 <template v-if="userRole === 'Abogado' || userRole === 'Administrador'">
                   <router-link 
+                    to="/dashboard" 
+                    class="text-[10px] font-bold uppercase tracking-widest bg-white/5 text-despacho-tierra px-4 py-2 rounded-lg hover:bg-white/10 transition-all border border-white/5 hidden md:block"
+                  >
+                    Dashboard
+                  </router-link>
+                  <router-link 
                     to="/citas" 
                     class="text-[10px] font-bold uppercase tracking-widest bg-white/5 text-despacho-tierra px-4 py-2 rounded-lg hover:bg-white/10 transition-all border border-white/5 hidden md:block"
                   >

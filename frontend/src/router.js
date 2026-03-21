@@ -6,6 +6,7 @@ import Casos from './views/Casos.vue'
 import Citas from './views/Citas.vue'
 import CasoDetalle from './views/CasoDetalle.vue'
 import MisCasos from './views/MisCasos.vue'
+import Dashboard from './views/Dashboard.vue'
 
 const obtenerRolToken = () => {
     const token = localStorage.getItem('token')
@@ -28,6 +29,7 @@ const obtenerRolToken = () => {
     { path: '/citas', name: 'Citas', component: Citas,meta: { requiresAuth: true, roles: ['Abogado', 'Administrador'] } },
     { path: '/mis-casos', name: 'MisCasos', component: MisCasos,meta: { requiresAuth: true, roles: ['Cliente', 'Administrador'] } },
     { path: '/caso/:id', name: 'CasoDetalle', component: CasoDetalle,meta: { requiresAuth: true } },
+    { path: '/dashboard', name: 'Dashboard', component: Dashboard, meta: { requiresAuth: true, roles: ['Abogado', 'Administrador'] } },
   ]
   
   const router = createRouter({
