@@ -1,3 +1,16 @@
-### Intentar ver expedientes sin gafete (Da 401)
-GET {{backend_HostAddress}}/api/casos
-Accept: application/json
+-- Insertar opciones de Ramas Juridicas
+INSERT INTO "RamasJuridicas" ("Descripcion") VALUES
+('Derecho Familiar'),
+('Derecho Laboral'),
+('Derecho Civil'),
+('Derecho Penal'),
+('Derecho Corporativo');
+
+-- Insertar opciones de Estatus de Casos
+INSERT INTO "Estatus" ("Descripcion") VALUES
+('Nuevo'),
+('En Proceso'),
+('En Revision'),
+('Pausado'),
+('Resuelto'),
+('Cerrado');

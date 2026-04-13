@@ -148,7 +148,7 @@
         correo: correo.value,
         contraseña: contrasena.value,
         User: correo.value.split('@')[0],
-        rolId: 2
+        rolId: 1
       })
   
       Swal.fire({

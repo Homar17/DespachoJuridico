@@ -30,6 +30,19 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+// --- 1. AQUÍ AGREGAMOS LA DEFINICIÓN DE CORS ---
+// Debe ir antes del builder.Build()
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("PermitirVue", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173") // Cambia el puerto si tu Vue usa otro
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+// -----------------------------------------------
+
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
@@ -43,6 +56,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// --- 2. AQUÍ APLICAMOS LA POLÍTICA DE CORS ---
+// ES VITAL QUE ESTÉ AQUÍ: Después de HttpsRedirection y ANTES de Authentication/Authorization
+app.UseCors("PermitirVue");
+// ---------------------------------------------
 
 app.UseAuthentication();
 app.UseAuthorization();

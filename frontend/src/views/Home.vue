@@ -158,12 +158,13 @@
   
   <script setup>
   import { ref, onMounted } from 'vue'
-  import { useRouter } from 'vue-router'
+  import { useRouter, useRoute } from 'vue-router'
   import axios from 'axios'
   import ModalCita from '../components/ModalCita.vue'
   import Swal from 'sweetalert2'
   
   const router = useRouter()
+  const route = useRoute()
   const mostrarModalCita = ref(false)
   const refModalCita = ref(null)
   
@@ -184,16 +185,65 @@
     }
   }
   
-  onMounted(() => {
+  // Hacemos el onMounted asíncrono para poder usar await al guardar la cita
+  onMounted(async () => {
     const token = localStorage.getItem('token')
     if (token) {
       const payload = decodificarJWT(token)
       if (payload) {
         isLogged.value = true
         userName.value = payload.Nombre
-        // Clave del Claim de Rol en .NET
         userRole.value = payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']
       }
+    }
+  
+    // Detectamos si venimos de regreso de Stripe
+    if (route.query.pago === 'exitoso') {
+      const citaPendiente = localStorage.getItem('citaPendiente')
+      
+      if (citaPendiente && token) {
+        try {
+          // AHORA SÍ: Como ya pagó, insertamos la cita en PostgreSQL
+          await axios.post('http://localhost:5039/api/citas', JSON.parse(citaPendiente), {
+            headers: { Authorization: `Bearer ${token}` }
+          })
+          
+          Swal.fire({
+            icon: 'success',
+            title: 'Pago Confirmado',
+            text: 'Tu asesoría jurídica ha sido agendada y pagada con éxito.',
+            background: '#1a1a1c',
+            color: '#fdfbd4',
+            confirmButtonColor: '#8B0000'
+          })
+        } catch (error) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error de sincronización',
+            text: 'El pago se realizó, pero hubo un problema al guardar tu cita. Contáctanos.',
+            background: '#1a1a1c',
+            color: '#fdfbd4',
+            confirmButtonColor: '#8B0000'
+          })
+        } finally {
+          // Limpiamos la memoria temporal
+          localStorage.removeItem('citaPendiente')
+        }
+      }
+      router.replace({ path: '/' })
+      
+    } else if (route.query.pago === 'cancelado') {
+      // Si canceló el pago, simplemente borramos los datos temporales
+      localStorage.removeItem('citaPendiente')
+      Swal.fire({
+        icon: 'info',
+        title: 'Pago Cancelado',
+        text: 'No se realizó ningún cargo. Tu cita no fue agendada.',
+        background: '#1a1a1c',
+        color: '#fdfbd4',
+        confirmButtonColor: '#8B0000'
+      })
+      router.replace({ path: '/' })
     }
   })
   
@@ -229,24 +279,20 @@
     }
   
     try {
-      await axios.post('http://localhost:5039/api/citas', payloadBackend, {
+      // 1. Guardamos los datos temporalmente en el navegador (no en la BD)
+      localStorage.setItem('citaPendiente', JSON.stringify(payloadBackend))
+      
+      // 2. Pedimos el link de cobro a Stripe
+      const respuestaStripe = await axios.post('http://localhost:5039/api/pagos/crear-sesion', {}, {
         headers: { Authorization: `Bearer ${token}` }
       })
       
-      mostrarModalCita.value = false
-      
-      Swal.fire({
-        icon: 'success',
-        title: '¡Asesoría Agendada!',
-        text: 'Tu cita ha sido registrada con éxito. Te esperamos.',
-        background: '#1a1a1c',
-        color: '#fdfbd4',
-        confirmButtonColor: '#8B0000',
-        confirmButtonText: 'Entendido'
-      })
+      // 3. Redirigimos al usuario a la página segura de Stripe
+      window.location.href = respuestaStripe.data.url
       
     } catch (error) {
-      const mensajeDelBackend = error.response?.data || "Ocurrió un error al agendar."
+      localStorage.removeItem('citaPendiente')
+      const mensajeDelBackend = error.response?.data || "Ocurrió un error al procesar el pago."
       refModalCita.value?.setMensajeError(typeof mensajeDelBackend === 'string' ? mensajeDelBackend : "Error desconocido.")
     }
   }
