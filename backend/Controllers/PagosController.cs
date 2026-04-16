@@ -8,6 +8,7 @@ namespace backend.Controllers
     [ApiController]
     public class PagosController : ControllerBase
     {
+        private readonly IConfiguration _config;
         public PagosController(IConfiguration config)
         {
             _config = config;
@@ -30,7 +31,7 @@ namespace backend.Controllers
                         PriceData = new SessionLineItemPriceDataOptions
                         {
                             // Stripe lee en centavos. 50000 = $500.00 MXN
-                            UnitAmount = 50000, 
+                            UnitAmount = 20000, 
                             Currency = "mxn",
                             ProductData = new SessionLineItemPriceDataProductDataOptions
                             {

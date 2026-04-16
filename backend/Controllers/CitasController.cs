@@ -1,6 +1,9 @@
 ﻿using backend.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+using System.Globalization;
+using backend.Services; // Importamos la carpeta de servicios
 
 namespace backend.Controllers
 {
@@ -9,10 +12,13 @@ namespace backend.Controllers
     public class CitasController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IEmailService _emailService; // Inyectamos el servicio
 
-        public CitasController(ApplicationDbContext context)
+        // Actualizamos el constructor para recibir el IEmailService
+        public CitasController(ApplicationDbContext context, IEmailService emailService)
         {
             _context = context;
+            _emailService = emailService;
         }
 
         // GET: api/Citas
@@ -64,8 +70,26 @@ namespace backend.Controllers
                 return Conflict("Este horario ya está reservado por otro cliente. Por favor, elige una hora diferente.");
             }
 
+            // 1. Guardamos la cita en la base de datos
             _context.Citas.Add(cita);
             await _context.SaveChangesAsync();
+
+            // 2. Traemos los datos del usuario para el correo
+            var usuario = await _context.Usuarios.FindAsync(cita.id_user);
+            
+            if (usuario != null)
+            {
+                // Ajustamos la fecha a la zona horaria local (UTC-6) para el texto del correo
+                var fechaLocal = cita.FechaHora.AddHours(-6);
+
+                // Enviamos el correo en segundo plano para no hacer esperar al frontend
+                _ = _emailService.EnviarCorreoConfirmacionAsync(
+                    usuario.Correo, // <-- AQUÍ ESTÁ EL CAMBIO
+                    usuario.Nombre, 
+                    fechaLocal.ToString("dd/MM/yyyy"), 
+                    fechaLocal.ToString("HH:mm")
+                );
+            }
 
             return CreatedAtAction(nameof(GetCita), new { id = cita.ID }, cita);
         }
@@ -89,6 +113,43 @@ namespace backend.Controllers
             }
 
             return NoContent();
+        }
+
+        //GET: Se obtienen las fechas y horas disponibles para citas
+        [AllowAnonymous]
+        [HttpGet("disponibilidad/{fecha}")]
+        public async Task<IActionResult> GetHorasDisponibles(string fecha)
+        {
+            if (!DateTime.TryParseExact(fecha, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime fechaConsulta))
+            {
+                return BadRequest($"Error de formato. C# recibió: {fecha}");
+            }
+
+            // 1. Establecer límites en base a Guadalajara (UTC-6)
+            var inicioDiaUtc = DateTime.SpecifyKind(fechaConsulta.Date, DateTimeKind.Utc).AddHours(6);
+            var finDiaUtc = inicioDiaUtc.AddDays(1);
+
+            var citasDelDia = await _context.Citas
+                .Where(c => c.FechaHora >= inicioDiaUtc && c.FechaHora < finDiaUtc)
+                .ToListAsync();
+
+            // 2. Extraer horas restando las 6 horas de UTC para compararlo con tu horario local
+            var horasOcupadas = citasDelDia
+                .Select(c => c.FechaHora.AddHours(-6).TimeOfDay)
+                .ToList();
+
+            var horasLaborales = new List<TimeSpan>();
+            for (int i = 9; i <= 18; i++)
+            {
+                horasLaborales.Add(TimeSpan.FromHours(i));
+            }
+
+            var horasDisponibles = horasLaborales
+                .Where(h => !horasOcupadas.Contains(h))
+                .Select(h => h.ToString(@"hh\:mm")) 
+                .ToList();
+
+            return Ok(horasDisponibles);
         }
 
         // DELETE: api/Citas/5 (Para cancelar citas)

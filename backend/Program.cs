@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using backend.Services; // 1. AQUÍ IMPORTAMOS LA CARPETA DE TUS SERVICIOS
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
@@ -31,12 +32,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 // --- 1. AQUÍ AGREGAMOS LA DEFINICIÓN DE CORS ---
-// Debe ir antes del builder.Build()
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("PermitirVue", policy =>
     {
-        policy.WithOrigins("http://localhost:5173") // Cambia el puerto si tu Vue usa otro
+        policy.WithOrigins("http://localhost:5173")
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
@@ -48,6 +48,10 @@ builder.Services.AddControllers().AddJsonOptions(options =>
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
 });
 
+// 2. AQUÍ REGISTRAMOS EL SERVICIO DE CORREO
+// Debe ir antes del builder.Build()
+builder.Services.AddScoped<IEmailService, EmailService>();
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -58,7 +62,6 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 // --- 2. AQUÍ APLICAMOS LA POLÍTICA DE CORS ---
-// ES VITAL QUE ESTÉ AQUÍ: Después de HttpsRedirection y ANTES de Authentication/Authorization
 app.UseCors("PermitirVue");
 // ---------------------------------------------
 
