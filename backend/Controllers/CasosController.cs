@@ -101,5 +101,26 @@ namespace backend.Controllers
         {
             return _context.Casos.Any(e => e.ID == id);
         }
+        
+        // GET: api/Casos/mis-casos
+        [HttpGet("mis-casos")]
+        public async Task<ActionResult<IEnumerable<Caso>>> GetMisCasos()
+        {
+            var userIdString = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value 
+                               ?? User.FindFirst(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub)?.Value;
+
+            if (string.IsNullOrEmpty(userIdString) || !int.TryParse(userIdString, out int userId))
+            {
+                return BadRequest("No se pudo identificar al usuario activo.");
+            }
+
+            var misCasos = await _context.Casos
+                .Include(c => c.Estatus)
+                .Include(c => c.RamaJuridica)
+                .Where(c => c.id_usuario == userId)
+                .ToListAsync();
+
+            return Ok(misCasos);
+        }
     }
 }
