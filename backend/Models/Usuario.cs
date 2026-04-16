@@ -30,7 +30,6 @@ namespace backend.Models
         [MaxLength(50)]
         public string User { get; set; } = string.Empty;
 
-        // Llave Foránea hacia Roles
         [Required]
         public int RolId { get; set; }
 

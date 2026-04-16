@@ -14,7 +14,6 @@ namespace backend.Models
         [MaxLength(100)]
         public string Descripcion { get; set; } = string.Empty;
 
-        // Un estatus puede estar en muchos casos
         public ICollection<Caso> Casos { get; set; } = new List<Caso>();
     }
 }

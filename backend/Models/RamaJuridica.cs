@@ -14,7 +14,6 @@ namespace backend.Models
         [MaxLength(100)]
         public string Descripcion { get; set; } = string.Empty;
 
-        // Una rama puede tener muchos casos
         public ICollection<Caso> Casos { get; set; } = new List<Caso>();
     }
 }

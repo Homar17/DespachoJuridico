@@ -14,7 +14,6 @@ namespace backend.Models
         [MaxLength(100)]
         public string Descripcion { get; set; } = string.Empty;
 
-        // Propiedad de navegación (Un Rol puede tener muchos Usuarios)
         public ICollection<Usuario> Usuarios { get; set; } = new List<Usuario>();
     }
 }
