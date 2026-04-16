@@ -263,37 +263,47 @@
   }
   
   const procesarAgendarCita = async (datosCita) => {
-    const token = localStorage.getItem('token')
-    const payload = decodificarJWT(token)
-    const userId = payload ? payload.sub : null
-  
-    if (!userId) {
-      refModalCita.value?.setMensajeError("Error de sesión. Vuelve a iniciar sesión.")
-      return
+  const token = localStorage.getItem('token')
+  const payload = decodificarJWT(token)
+  const userId = payload ? payload.sub : null
+
+  if (!userId) {
+    refModalCita.value?.setMensajeError("Error de sesión. Vuelve a iniciar sesión.")
+    return
+  }
+
+  try {
+    const fechaObj = new Date(datosCita.FechaHora)
+    const fechaLocal = `${fechaObj.getFullYear()}-${String(fechaObj.getMonth() + 1).padStart(2, '0')}-${String(fechaObj.getDate()).padStart(2, '0')}`
+    const horaLocal = `${String(fechaObj.getHours()).padStart(2, '0')}:00`
+
+    const responseDisponibilidad = await axios.get(`http://localhost:5039/api/citas/disponibilidad/${fechaLocal}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+
+    if (!responseDisponibilidad.data.includes(horaLocal)) {
+      refModalCita.value?.setMensajeError("Alguien más acaba de reservar esta hora. Elige otra, por favor.")
+      return 
     }
-  
+
     const payloadBackend = {
       id_user: parseInt(userId),
       FechaHora: datosCita.FechaHora,
       Descripcion: datosCita.Descripcion
     }
-  
-    try {
-      // 1. Guardamos los datos temporalmente en el navegador (no en la BD)
-      localStorage.setItem('citaPendiente', JSON.stringify(payloadBackend))
-      
-      // 2. Pedimos el link de cobro a Stripe
-      const respuestaStripe = await axios.post('http://localhost:5039/api/pagos/crear-sesion', {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-      
-      // 3. Redirigimos al usuario a la página segura de Stripe
-      window.location.href = respuestaStripe.data.url
-      
-    } catch (error) {
-      localStorage.removeItem('citaPendiente')
-      const mensajeDelBackend = error.response?.data || "Ocurrió un error al procesar el pago."
-      refModalCita.value?.setMensajeError(typeof mensajeDelBackend === 'string' ? mensajeDelBackend : "Error desconocido.")
-    }
+
+    localStorage.setItem('citaPendiente', JSON.stringify(payloadBackend))
+    
+    const respuestaStripe = await axios.post('http://localhost:5039/api/pagos/crear-sesion', {}, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    
+    window.location.href = respuestaStripe.data.url
+    
+  } catch (error) {
+    localStorage.removeItem('citaPendiente')
+    const mensajeDelBackend = error.response?.data || "Ocurrió un error al procesar el pago."
+    refModalCita.value?.setMensajeError(typeof mensajeDelBackend === 'string' ? mensajeDelBackend : "Error desconocido.")
   }
+}
   </script>
